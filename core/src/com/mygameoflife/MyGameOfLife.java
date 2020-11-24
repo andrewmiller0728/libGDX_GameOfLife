@@ -61,8 +61,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		}
 		batch.end();
 
-		gm.nextMoveAll(true);
-		gm.clearDead();
+		gm.update();
 	}
 	
 	@Override

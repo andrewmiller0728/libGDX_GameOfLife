@@ -50,6 +50,49 @@ public class GameMaster {
     /*
     Cell Management
      */
+    public void update() {
+        clearDead();
+        updateEnergyNeighborhoods();
+        nextMoveAll(true);
+    }
+
+    public void updateEnergyNeighborhoods() {
+        for (Cell cell : colony) {
+            cell.setEnergyNeighborhood(getNeighborhood(cell));
+        }
+    }
+
+    /*
+    offsets:
+        0 1 2
+        3 4 5
+        6 7 8
+     */
+    private Energy[] getNeighborhood(Cell cell) {
+        Energy[] neighborhood = new Energy[9];
+        Vector2[] offsets = {
+                new Vector2(-1f, 1f),
+                new Vector2(0f, 1f),
+                new Vector2(1f, 1f),
+                new Vector2(-1f, 0f),
+                new Vector2(0f, 0f),
+                new Vector2(1f, 0f),
+                new Vector2(-1f, -1f),
+                new Vector2(0f, -1f),
+                new Vector2(1f, -1f)
+        };
+        for (int i = 0; i < offsets.length; i++) {
+            for (Energy stack : energyStacks) {
+                if (stack.getPosition().equals(
+                        cell.getPosition().cpy().add(offsets[i])
+                )) {
+                    neighborhood[i] = stack;
+                }
+            }
+        }
+        return neighborhood;
+    }
+
     public GameMaster clearDead() {
         for (int i = 0; i < colony.size(); i++) {
             if (colony.get(i).getEnergy().getAmount() <= 0) {
@@ -70,6 +113,13 @@ public class GameMaster {
         }
         return this;
     }
+
+    private GameMaster consumeEnergyStack(Cell cell, Energy stack) {
+        if (cell.getPosition().equals(stack.getPosition())) {
+            cell.gainEnergy(stack.dump());
+        }
+        return this;
+    }
     
     public GameMaster nextMoveAll() {
         return nextMoveAll(false);
@@ -87,31 +137,18 @@ public class GameMaster {
         return this;
     }
 
-    public GameMaster chooseNextMove(Cell cell) {
-        switch (cell.getOutputChoice()) {
-            case 0:
-                cell.movePosY();
-                break;
-            case 1:
-                cell.movePosX();
-                break;
-            case 2:
-                cell.moveNegY();
-                break;
-            case 3:
-                cell.moveNegX();
-                break;
-            case 4:
-                cell.sleep();
-                break;
-            default:
-                break;
-        }
+    private GameMaster chooseNextMove(Cell cell) {
+        nextMoveHelper(cell.getOutputChoice(), cell);
         return this;
     }
 
-    public GameMaster randomNextMove(Cell cell) {
-        switch (MathUtils.random(50)) {
+    private GameMaster randomNextMove(Cell cell) {
+        nextMoveHelper(MathUtils.random(50), cell);
+        return this;
+    }
+
+    private void nextMoveHelper(int choice, Cell cell) {
+        switch (choice) {
             case 0:
                 cell.movePosY();
                 break;
@@ -125,11 +162,19 @@ public class GameMaster {
                 cell.moveNegX();
                 break;
             case 4:
-            default:
+                if (cell.getEnergyNeighborhood()[4] != null) {
+                    consumeEnergyStack(
+                            cell,
+                            cell.getEnergyNeighborhood()[4]
+                    );
+                }
+                break;
+            case 5:
                 cell.sleep();
                 break;
+            default:
+                break;
         }
-        return this;
     }
 
 

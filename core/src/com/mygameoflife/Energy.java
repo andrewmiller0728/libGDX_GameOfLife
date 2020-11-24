@@ -24,6 +24,12 @@ public class Energy {
         amount += delta;
     }
 
+    public float dump() {
+        float temp = amount;
+        amount = 0;
+        return temp;
+    }
+
     public Vector2 getPosition() {
         return position;
     }

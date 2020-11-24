@@ -16,6 +16,7 @@ public class Cell {
     private float heat;
     private Vector2 position;
     private NeuralNetwork NN;
+    private Energy[] energyNeighborhood;
 
 
     /*
@@ -28,11 +29,12 @@ public class Cell {
         this.position = initPosition;
         this.NN = new NeuralNetwork(
                 ID_,
-                3,
+                12,
                 5,
                 6,
                 2
         );
+        energyNeighborhood = new Energy[9];
     }
 
 
@@ -41,11 +43,14 @@ public class Cell {
      */
 
     public int getOutputChoice() {
-        double[] inputs = {
-                position.x,
-                position.y,
-                energy.getAmount()
-        };
+        double[] inputs = new double[12];
+        inputs[0] = position.x;
+        inputs[1] = position.y;
+        inputs[2] = energy.getAmount();
+        for (int i = 0; i < energyNeighborhood.length; i++) {
+            inputs[i + 3] = energyNeighborhood[i].getAmount();
+        }
+
         double[] outputs = NN.getOutputs(inputs);
         int indexMax = -1;
         double maxValue = Double.MIN_VALUE;
@@ -153,5 +158,13 @@ public class Cell {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public void setEnergyNeighborhood(Energy[] energyNeighborhood) {
+        this.energyNeighborhood = energyNeighborhood;
+    }
+
+    public Energy[] getEnergyNeighborhood() {
+        return energyNeighborhood;
     }
 }
