@@ -12,7 +12,7 @@ public class Cell {
     private final float MOVE_COST = 2;
 
     private int ID;
-    private float energy;
+    private Energy energy;
     private float heat;
     private Vector2 position;
     private NeuralNetwork NN;
@@ -23,12 +23,12 @@ public class Cell {
      */
     public Cell(int ID_, Vector2 initPosition) {
         this.ID = ID_;
-        this.energy = INIT_ENERGY;
+        this.energy = new Energy(INIT_ENERGY);
         this.heat = INIT_HEAT;
         this.position = initPosition;
         this.NN = new NeuralNetwork(
                 ID_,
-                2,
+                3,
                 5,
                 6,
                 2
@@ -41,7 +41,11 @@ public class Cell {
      */
 
     public int getOutputChoice() {
-        double[] inputs = {position.x, position.y};
+        double[] inputs = {
+                position.x,
+                position.y,
+                energy.getAmount()
+        };
         double[] outputs = NN.getOutputs(inputs);
         int indexMax = -1;
         double maxValue = Double.MIN_VALUE;
@@ -61,25 +65,25 @@ public class Cell {
 
     public Cell movePosX() {
         position.add(1f, 0f);
-        energy -= MOVE_COST;
+        energy.deplete(MOVE_COST);
         return this;
     }
 
     public Cell moveNegX() {
         position.sub(1f, 0f);
-        energy -= MOVE_COST;
+        energy.deplete(MOVE_COST);
         return this;
     }
 
     public Cell movePosY() {
         position.add(0f, 1f);
-        energy -= MOVE_COST;
+        energy.deplete(MOVE_COST);
         return this;
     }
 
     public Cell moveNegY() {
         position.sub(0f, 1f);
-        energy -= MOVE_COST;
+        energy.deplete(MOVE_COST);
         return this;
     }
 
@@ -107,7 +111,6 @@ public class Cell {
      */
 
     public Cell sleep() {
-
         return this;
     }
 
@@ -122,12 +125,12 @@ public class Cell {
     }
 
     public Cell gainEnergy(float amount) {
-        energy += amount;
+        energy.charge(amount);
         return this;
     }
 
     public Cell loseEnergy(float amount) {
-        energy += amount;
+        energy.deplete(amount);
         return this;
     }
 
@@ -140,7 +143,7 @@ public class Cell {
         return ID;
     }
 
-    public float getEnergy() {
+    public Energy getEnergy() {
         return energy;
     }
 

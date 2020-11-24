@@ -1,5 +1,6 @@
 package com.mygameoflife;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
@@ -9,9 +10,11 @@ public class GameMaster {
     /*
     Variables
      */
+    public final Vector2 MAX_GAME_SIZE = new Vector2(1028, 1028);
     private final Vector2 INIT_POSITION = new Vector2(0f, 0f);
     private Vector2 initPosition;
     private ArrayList<Cell> colony;
+    private ArrayList<Energy> energyStacks;
 
 
     /*
@@ -23,6 +26,22 @@ public class GameMaster {
         for (int i = 0; i < count; i++) {
             colony.add(new Cell(i, initPosition.cpy()));
         }
+        for (int i = 0; i < 512; i++) {
+            energyStacks.add(
+                    new Energy(
+                            MathUtils.random(100),
+                            new Vector2(
+                                    MathUtils.random(
+                                            -1f * MAX_GAME_SIZE.x / 2f,
+                                            MAX_GAME_SIZE.x / 2f),
+                                    MathUtils.random(
+                                            -1f * MAX_GAME_SIZE.y / 2f,
+                                            MAX_GAME_SIZE.y / 2f
+                                    )
+                            )
+                    )
+            );
+        }
     }
 
 
@@ -31,8 +50,13 @@ public class GameMaster {
      */
     public GameMaster clearDead() {
         for (int i = 0; i < colony.size(); i++) {
-            if (colony.get(i).getEnergy() < 0) {
+            if (colony.get(i).getEnergy().getAmount() <= 0) {
                 colony.remove(i);
+            }
+        }
+        for (int i = 0; i < energyStacks.size(); i++) {
+            if (energyStacks.get(i).getAmount() <= 0) {
+                energyStacks.remove(i);
             }
         }
         return this;

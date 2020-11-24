@@ -18,7 +18,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
-	private Texture cellTexture;
+	private Texture cellTexture, energyTexture;
 	private ShapeRenderer shapeRenderer;
 
 	private GameMaster gm;
@@ -34,6 +34,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		camera = new OrthographicCamera(viewWidth, viewHeight);
 		batch = new SpriteBatch();
 		cellTexture = new Texture("icon_cell.jpg");
+		energyTexture = new Texture("icon_energy.jpg");
 		shapeRenderer = new ShapeRenderer();
 
 		gm = new GameMaster(256);
@@ -55,6 +56,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 			drawCell(cell);
 			expandCamera(cell);
 		}
+		for (Energy stack : gm.)
 		batch.end();
 
 		gm.nextMoveAll();
