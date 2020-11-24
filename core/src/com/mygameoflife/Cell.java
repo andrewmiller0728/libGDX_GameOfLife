@@ -23,7 +23,7 @@ public class Cell {
      */
     public Cell(int ID_, Vector2 initPosition) {
         this.ID = ID_;
-        this.energy = new Energy(INIT_ENERGY);
+        this.energy = new Energy(INIT_ENERGY, initPosition);
         this.heat = INIT_HEAT;
         this.position = initPosition;
         this.NN = new NeuralNetwork(

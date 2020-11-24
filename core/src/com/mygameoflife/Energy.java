@@ -9,7 +9,7 @@ public class Energy {
 
     public Energy(float initAmount, Vector2 initPosition) {
         amount = initAmount;
-        position = initPosition.cpy();
+        position = initPosition;
     }
 
     public float getAmount() {
@@ -22,5 +22,9 @@ public class Energy {
 
     public void charge(float delta) {
         amount += delta;
+    }
+
+    public Vector2 getPosition() {
+        return position;
     }
 }

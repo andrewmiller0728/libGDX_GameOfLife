@@ -37,12 +37,12 @@ public class MyGameOfLife extends ApplicationAdapter {
 		energyTexture = new Texture("icon_energy.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		gm = new GameMaster(256);
+		gm = new GameMaster(512);
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(0.2f, 0.6f, 0.6f, 1f);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
@@ -56,10 +56,12 @@ public class MyGameOfLife extends ApplicationAdapter {
 			drawCell(cell);
 			expandCamera(cell);
 		}
-		for (Energy stack : gm.)
+		for (Energy stack : gm.getEnergyStacks()) {
+			drawEnergy(stack);
+		}
 		batch.end();
 
-		gm.nextMoveAll();
+		gm.nextMoveAll(true);
 		gm.clearDead();
 	}
 	
@@ -70,10 +72,20 @@ public class MyGameOfLife extends ApplicationAdapter {
 	}
 
 	private void drawCell(Cell cell_) {
+		batch.setColor(1f, 1f,1f,0.2f);
 		batch.draw(
 				cellTexture,
 				(cell_.getPosition().x * 8f) - (cellTexture.getWidth() / 2f),
 				(cell_.getPosition().y * 8f) - (cellTexture.getHeight() / 2f)
+		);
+	}
+
+	private void drawEnergy(Energy stack) {
+		batch.setColor(1f, 1f,1f,0.8f);
+		batch.draw(
+				energyTexture,
+				(stack.getPosition().x * 8f) - (energyTexture.getWidth() / 2f),
+				(stack.getPosition().y * 8f) - (energyTexture.getHeight() / 2f)
 		);
 	}
 
@@ -82,12 +94,14 @@ public class MyGameOfLife extends ApplicationAdapter {
 				|| cell.getPosition().x > (viewWidth / 16f)
 				|| cell.getPosition().y < (-1f * viewHeight / 16f)
 				|| cell.getPosition().y > (viewHeight / 16f)) {
-			camera.viewportWidth = viewWidth + 8f;
-			camera.viewportHeight = viewHeight + 8f;
-			camera.update();
-			viewWidth = camera.viewportWidth;
-			viewHeight = camera.viewportHeight;
-			System.out.printf("New view = (%.3f, %.3f)\n", viewWidth, viewHeight);
+			if (camera.viewportWidth < gm.MAX_GAME_SIZE.x
+					&& camera.viewportHeight < gm.MAX_GAME_SIZE.y) {
+				camera.viewportWidth = viewWidth + 8f;
+				camera.viewportHeight = viewHeight + 8f;
+				camera.update();
+				viewWidth = camera.viewportWidth;
+				viewHeight = camera.viewportHeight;
+			}
 		}
 	}
 
