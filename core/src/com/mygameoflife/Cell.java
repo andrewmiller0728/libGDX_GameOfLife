@@ -11,7 +11,7 @@ public class Cell {
     private final float INIT_HEAT = 100f;
     private final float MOVE_COST = 2;
 
-    private String ID;
+    private int ID;
     private float energy;
     private float heat;
     private Vector2 position;
@@ -20,7 +20,7 @@ public class Cell {
     /*
     Constructor
      */
-    public Cell(String ID_, Vector2 initPosition) {
+    public Cell(int ID_, Vector2 initPosition) {
         this.ID = ID_;
         this.energy = INIT_ENERGY;
         this.heat = INIT_HEAT;
@@ -104,7 +104,7 @@ public class Cell {
     Getters and Setters
      */
 
-    public String getID() {
+    public int getID() {
         return ID;
     }
 

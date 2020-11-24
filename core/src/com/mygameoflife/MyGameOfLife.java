@@ -40,7 +40,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		for (int i = 0; i < 512; i++) {
 			colony.add(
 					new Cell(
-							"myCell",
+							0,
 							new Vector2(
 									MathUtils.round(MathUtils.random(-1 * viewWidth / 16f + 1, viewWidth / 16f - 1)),
 									MathUtils.round(MathUtils.random(-1 * viewWidth / 16f + 1, viewWidth / 16f - 1))
@@ -57,19 +57,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setColor(0.2f, 0.2f, 0.2f, 1);
-		for (int x = MathUtils.round(-1 * viewWidth / 2f); x < MathUtils.round(viewWidth / 2f); x += 8) {
-			shapeRenderer.rectLine(
-					new Vector2(x, MathUtils.round(-1 * viewHeight / 2f)),
-					new Vector2(x, MathUtils.round(viewHeight / 2f)),
-					2);
-		}
-		for (int y = MathUtils.round(-1 * viewHeight / 2f); y < MathUtils.round(viewHeight / 2f); y += 8) {
-			shapeRenderer.rectLine(
-					new Vector2(MathUtils.round(-1 * viewWidth / 2f), y),
-					new Vector2(MathUtils.round(viewWidth / 2f), y),
-					2);
-		}
+		drawGrid();
 		shapeRenderer.end();
 
 		batch.setProjectionMatrix(camera.combined);
@@ -122,6 +110,23 @@ public class MyGameOfLife extends ApplicationAdapter {
 			camera.update();
 			viewWidth = camera.viewportWidth;
 			viewHeight = camera.viewportHeight;
+		}
+	}
+
+	private void drawGrid() {
+		shapeRenderer.setColor(0.2f, 0.2f, 0.2f, 1);
+		for (int x = MathUtils.round(-1 * viewWidth / 2f); x < MathUtils.round(viewWidth / 2f); x += 8) {
+			shapeRenderer.rectLine(
+					new Vector2(x, MathUtils.round(-1 * viewHeight / 2f)),
+					new Vector2(x, MathUtils.round(viewHeight / 2f)),
+					1);
+		}
+		for (int y = MathUtils.round(-1 * viewHeight / 2f); y < MathUtils.round(viewHeight / 2f); y += 8) {
+			shapeRenderer.rectLine(
+					new Vector2(MathUtils.round(-1 * viewWidth / 2f), y),
+					new Vector2(MathUtils.round(viewWidth / 2f), y),
+					1
+			);
 		}
 	}
 }
