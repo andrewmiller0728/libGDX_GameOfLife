@@ -36,7 +36,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		cellTexture = new Texture("icon_cell.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		gm = new GameMaster(128);
+		gm = new GameMaster(256);
 	}
 
 	@Override
@@ -53,27 +53,11 @@ public class MyGameOfLife extends ApplicationAdapter {
 		batch.begin();
 		for (Cell cell : gm.getColony()) {
 			drawCell(cell);
-			switch (MathUtils.random(10)) {
-				case 0:
-					cell.movePosY();
-					break;
-				case 1:
-					cell.movePosX();
-					break;
-				case 2:
-					cell.moveNegY();
-					break;
-				case 3:
-					cell.moveNegX();
-					break;
-				case 4:
-				default:
-					break;
-			}
 			expandCamera(cell);
 		}
 		batch.end();
 
+		gm.nextMoveAll();
 		gm.clearDead();
 	}
 	
@@ -101,6 +85,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 			camera.update();
 			viewWidth = camera.viewportWidth;
 			viewHeight = camera.viewportHeight;
+			System.out.printf("New view = (%.3f, %.3f)\n", viewWidth, viewHeight);
 		}
 	}
 

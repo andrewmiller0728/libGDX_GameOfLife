@@ -44,6 +44,36 @@ public class GameMaster {
         }
         return this;
     }
+    
+    public GameMaster nextMoveAll() {
+        for (Cell cell : colony) {
+            takeNextMove(cell);
+        }
+        return this;
+    }
+
+    public GameMaster takeNextMove(Cell cell) {
+        switch (cell.getOutputChoice()) {
+            case 0:
+                cell.movePosY();
+                break;
+            case 1:
+                cell.movePosX();
+                break;
+            case 2:
+                cell.moveNegY();
+                break;
+            case 3:
+                cell.moveNegX();
+                break;
+            case 4:
+                cell.sleep();
+                break;
+            default:
+                break;
+        }
+        return this;
+    }
 
 
     /*

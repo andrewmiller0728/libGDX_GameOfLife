@@ -7,7 +7,7 @@ public class Cell {
     /*
     Variables
      */
-    private final float INIT_ENERGY = 100f;
+    private final float INIT_ENERGY = 500f;
     private final float INIT_HEAT = 100f;
     private final float MOVE_COST = 2;
 
@@ -15,6 +15,7 @@ public class Cell {
     private float energy;
     private float heat;
     private Vector2 position;
+    private NeuralNetwork NN;
 
 
     /*
@@ -25,6 +26,32 @@ public class Cell {
         this.energy = INIT_ENERGY;
         this.heat = INIT_HEAT;
         this.position = initPosition;
+        this.NN = new NeuralNetwork(
+                ID_,
+                2,
+                5,
+                6,
+                2
+        );
+    }
+
+
+    /*
+    Intelligence Methods
+     */
+
+    public int getOutputChoice() {
+        double[] inputs = {position.x, position.y};
+        double[] outputs = NN.getOutputs(inputs);
+        int indexMax = -1;
+        double maxValue = Double.MIN_VALUE;
+        for (int i = 0; i < outputs.length; i++) {
+            if (outputs[i] > maxValue) {
+                indexMax = i;
+                maxValue = outputs[i];
+            }
+        }
+        return indexMax;
     }
 
 
@@ -78,6 +105,11 @@ public class Cell {
     /*
     Homeostasis Methods
      */
+
+    public Cell sleep() {
+
+        return this;
+    }
 
     public Cell gainHeat(float amount) {
         heat += amount;
