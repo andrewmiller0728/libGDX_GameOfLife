@@ -10,7 +10,7 @@ public class GameMaster {
     /*
     Variables
      */
-    public final Vector2 MAX_GAME_SIZE = new Vector2(512f, 512f);
+    public final Vector2 MAX_GAME_SIZE = new Vector2(800f, 800f);
     private final Vector2 INIT_POSITION = new Vector2(0f, 0f);
     private Vector2 initPosition;
     private ArrayList<Cell> colony;
@@ -53,7 +53,8 @@ public class GameMaster {
     public void update() {
         clearDead();
         updateEnergyNeighborhoods();
-        nextMoveAll(true);
+        nextMoveAll(false);
+        ageCells();
     }
 
     public void updateEnergyNeighborhoods() {
@@ -107,9 +108,29 @@ public class GameMaster {
         return this;
     }
 
+    public GameMaster clearOutofBounds() {
+        for (int i = 0; i < colony.size(); i++) {
+            Cell currCell = colony.get(i);
+            if (currCell.getPosition().x > MAX_GAME_SIZE.x
+                    || currCell.getPosition().x < -1f * MAX_GAME_SIZE.x
+                    || currCell.getPosition().y < -1f * MAX_GAME_SIZE.y
+                    || currCell.getPosition().y > MAX_GAME_SIZE.y) {
+                colony.remove(i);
+            }
+        }
+        return this;
+    }
+
     public GameMaster generateCells(int count) {
         for (int i = 0; i < count; i++) {
             colony.add(new Cell(i, initPosition.cpy()));
+        }
+        return this;
+    }
+
+    public GameMaster ageCells() {
+        for (Cell cell : colony) {
+            cell.incrementAge();
         }
         return this;
     }
@@ -126,12 +147,12 @@ public class GameMaster {
     }
 
     public GameMaster nextMoveAll(boolean random) {
-        for (Cell cell : colony) {
+        for (int i = 0; i < colony.size(); i++) {
             if (random) {
-                randomNextMove(cell);
+                randomNextMove(colony.get(i));
             }
             else {
-                chooseNextMove(cell);
+                chooseNextMove(colony.get(i));
             }
         }
         return this;
@@ -170,9 +191,10 @@ public class GameMaster {
                 }
                 break;
             case 5:
-                cell.sleep();
+                colony.add(cell.divide());
                 break;
             default:
+                cell.sleep();
                 break;
         }
     }

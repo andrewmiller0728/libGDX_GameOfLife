@@ -9,7 +9,7 @@ public class Cell {
      */
     private final float INIT_ENERGY = 500f;
     private final float INIT_HEAT = 100f;
-    private final float MOVE_COST = 2;
+    private final float MOVE_COST = 5;
 
     private int ID;
     private Energy energy;
@@ -17,6 +17,7 @@ public class Cell {
     private Vector2 position;
     private NeuralNetwork NN;
     private Energy[] energyNeighborhood;
+    private int age;
 
 
     /*
@@ -29,12 +30,13 @@ public class Cell {
         this.position = initPosition;
         this.NN = new NeuralNetwork(
                 ID_,
-                12,
-                5,
-                6,
+                13,
+                7,
+                14,
                 2
         );
         energyNeighborhood = new Energy[9];
+        age = 0;
     }
 
 
@@ -43,12 +45,15 @@ public class Cell {
      */
 
     public int getOutputChoice() {
-        double[] inputs = new double[12];
+        double[] inputs = new double[13];
         inputs[0] = position.x;
         inputs[1] = position.y;
-        inputs[2] = energy.getAmount();
+        inputs[2] = age;
+        inputs[3] = energy.getAmount();
         for (int i = 0; i < energyNeighborhood.length; i++) {
-            inputs[i + 3] = energyNeighborhood[i].getAmount();
+            if (energyNeighborhood[i] != null) {
+                inputs[i + 3] = energyNeighborhood[i].getAmount();
+            }
         }
 
         double[] outputs = NN.getOutputs(inputs);
@@ -115,7 +120,13 @@ public class Cell {
     Homeostasis Methods
      */
 
+    public Cell divide() {
+        energy.deplete(100f);
+        return new Cell(this.ID, this.position.cpy());
+    }
+
     public Cell sleep() {
+        energy.deplete(1);
         return this;
     }
 
@@ -136,6 +147,11 @@ public class Cell {
 
     public Cell loseEnergy(float amount) {
         energy.deplete(amount);
+        return this;
+    }
+
+    public Cell incrementAge() {
+        age++;
         return this;
     }
 
