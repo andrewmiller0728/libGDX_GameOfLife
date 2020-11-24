@@ -20,8 +20,8 @@ public class Cell {
     /*
     Constructor
      */
-    public Cell(String id, Vector2 initPosition) {
-        this.ID = id;
+    public Cell(String ID_, Vector2 initPosition) {
+        this.ID = ID_;
         this.energy = INIT_ENERGY;
         this.heat = INIT_HEAT;
         this.position = initPosition;
