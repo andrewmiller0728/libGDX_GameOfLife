@@ -21,7 +21,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 	private Texture cellTexture;
 	private ShapeRenderer shapeRenderer;
 
-	private ArrayList<Cell> colony;
+	private GameMaster gm;
 	
 	@Override
 	public void create () {
@@ -36,18 +36,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		cellTexture = new Texture("icon_cell.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		colony = new ArrayList<>();
-		for (int i = 0; i < 512; i++) {
-			colony.add(
-					new Cell(
-							0,
-							new Vector2(
-									MathUtils.round(MathUtils.random(-1 * viewWidth / 16f + 1, viewWidth / 16f - 1)),
-									MathUtils.round(MathUtils.random(-1 * viewWidth / 16f + 1, viewWidth / 16f - 1))
-							)
-					)
-			);
-		}
+		gm = new GameMaster(128);
 	}
 
 	@Override
@@ -62,7 +51,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		for (Cell cell : colony) {
+		for (Cell cell : gm.getColony()) {
 			drawCell(cell);
 			switch (MathUtils.random(10)) {
 				case 0:
@@ -84,6 +73,8 @@ public class MyGameOfLife extends ApplicationAdapter {
 			expandCamera(cell);
 		}
 		batch.end();
+
+		gm.clearDead();
 	}
 	
 	@Override

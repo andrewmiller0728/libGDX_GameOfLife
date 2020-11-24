@@ -7,7 +7,7 @@ public class Cell {
     /*
     Variables
      */
-    private final float INIT_ENERGY = 50f;
+    private final float INIT_ENERGY = 100f;
     private final float INIT_HEAT = 100f;
     private final float MOVE_COST = 2;
 
@@ -33,42 +33,42 @@ public class Cell {
      */
 
     public Cell movePosX() {
-        this.position.add(1f, 0f);
+        position.add(1f, 0f);
         energy -= MOVE_COST;
         return this;
     }
 
     public Cell moveNegX() {
-        this.position.sub(1f, 0f);
+        position.sub(1f, 0f);
         energy -= MOVE_COST;
         return this;
     }
 
     public Cell movePosY() {
-        this.position.add(0f, 1f);
+        position.add(0f, 1f);
         energy -= MOVE_COST;
         return this;
     }
 
     public Cell moveNegY() {
-        this.position.sub(0f, 1f);
+        position.sub(0f, 1f);
         energy -= MOVE_COST;
         return this;
     }
 
     public Cell moveTo(Vector2 goal) {
-        while (this.position.x != goal.x || this.position.y != goal.y) {
-            if (this.position.x < goal.x) {
-                this.movePosX();
+        while (position.x != goal.x || position.y != goal.y) {
+            if (position.x < goal.x) {
+                movePosX();
             }
-            else if (this.position.x > goal.x) {
-                this.moveNegX();
+            else if (position.x > goal.x) {
+                moveNegX();
             }
-            if (this.position.y < goal.y) {
-                this.movePosY();
+            if (position.y < goal.y) {
+                movePosY();
             }
-            else if (this.position.y > goal.y) {
-                this.moveNegY();
+            else if (position.y > goal.y) {
+                moveNegY();
             }
         }
         return this;
