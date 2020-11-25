@@ -7,7 +7,7 @@ public class Cell {
     /*
     Variables
      */
-    private final float INIT_ENERGY = 100f;
+    private final float INIT_ENERGY = 250f;
     private final float INIT_HEAT = 100f;
     private final float MOVE_COST = 5f, SLEEP_COST = 2f, DIV_COST = 25f;
 
@@ -17,7 +17,7 @@ public class Cell {
     private Vector2 position;
     private NeuralNetwork network;
     private Energy[] energyNeighborhood;
-    private int age;
+    private int age, turnsSinceMove;
 
 
     /*
@@ -37,6 +37,7 @@ public class Cell {
         );
         energyNeighborhood = new Energy[9];
         age = 0;
+        turnsSinceMove = 0;
     }
 
     public Cell(int ID_, Vector2 initPosition, NeuralNetwork network) {
@@ -47,6 +48,7 @@ public class Cell {
         this.network = network;
         energyNeighborhood = new Energy[9];
         age = 0;
+        turnsSinceMove = 0;
     }
 
 
@@ -86,24 +88,28 @@ public class Cell {
     public Cell movePosX() {
         position.add(1f, 0f);
         energy.deplete(MOVE_COST);
+        turnsSinceMove = 0;
         return this;
     }
 
     public Cell moveNegX() {
         position.sub(1f, 0f);
         energy.deplete(MOVE_COST);
+        turnsSinceMove = 0;
         return this;
     }
 
     public Cell movePosY() {
         position.add(0f, 1f);
         energy.deplete(MOVE_COST);
+        turnsSinceMove = 0;
         return this;
     }
 
     public Cell moveNegY() {
         position.sub(0f, 1f);
         energy.deplete(MOVE_COST);
+        turnsSinceMove = 0;
         return this;
     }
 
@@ -122,6 +128,7 @@ public class Cell {
                 moveNegY();
             }
         }
+        turnsSinceMove = 0;
         return this;
     }
 
@@ -132,31 +139,37 @@ public class Cell {
 
     public Cell divide() {
         energy.deplete(DIV_COST);
-        return new Cell(ID + 1, position.cpy(), network.getCopy());
+        turnsSinceMove++;
+        return new Cell(ID + 1, position.cpy(), network.getCopy().walkValues(0.001));
     }
 
     public Cell sleep() {
         energy.deplete(SLEEP_COST);
+        turnsSinceMove++;
         return this;
     }
 
     public Cell gainHeat(float amount) {
         heat += amount;
+        turnsSinceMove++;
         return this;
     }
 
     public Cell loseHeat(float amount) {
         heat += amount;
+        turnsSinceMove++;
         return this;
     }
 
     public Cell gainEnergy(float amount) {
         energy.charge(amount);
+        turnsSinceMove++;
         return this;
     }
 
     public Cell loseEnergy(float amount) {
         energy.deplete(amount);
+        turnsSinceMove++;
         return this;
     }
 
@@ -196,5 +209,9 @@ public class Cell {
 
     public int getAge() {
         return age;
+    }
+
+    public int getTurnsSinceMove() {
+        return turnsSinceMove;
     }
 }

@@ -37,7 +37,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		energyTexture = new Texture("icon_energy.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		gm = new GameMaster((int) Math.pow(2, 8));
+		gm = new GameMaster((int) Math.pow(2, 14));
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 			drawCell(cell);
 			expandCamera(cell);
 		}
-		for (Energy stack : gm.getEnergyStacks()) {
+		for (Energy stack : gm.getEnergyField().getEntries()) {
 			drawEnergy(stack);
 		}
 		batch.end();

@@ -12,39 +12,25 @@ public class GameMaster {
      */
     public final Vector2 MAX_GAME_SIZE = new Vector2(800f, 800f);
     private final Vector2 INIT_POSITION = new Vector2(0f, 0f);
-    private final int LEADERBOARD_SIZE = 32;
+    private final int LEADERBOARD_SIZE = (int) Math.pow(2, 10);
+    private int initColonySize;
     private Vector2 initPosition;
     private ArrayList<Cell> colony, leaderboard;
-    private ArrayList<Energy> energyStacks;
+    private EnergyField energyField;
 
     /*
     Constructor
      */
     public GameMaster(int count) {
+        initColonySize = count;
         colony = new ArrayList<>();
         initPosition = INIT_POSITION.cpy();
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < initColonySize; i++) {
             colony.add(new Cell(i, initPosition.cpy()));
         }
-        energyStacks = new ArrayList<>();
-        for (int i = 0; i < 1024; i++) {
-            energyStacks.add(
-                    new Energy(
-                            25,
-                            new Vector2(
-                                    MathUtils.round(MathUtils.random(
-                                            -1f * MAX_GAME_SIZE.x / 16f,
-                                            MAX_GAME_SIZE.x / 16f
-                                    )),
-                                    MathUtils.round(MathUtils.random(
-                                            -1f * MAX_GAME_SIZE.y / 16f,
-                                            MAX_GAME_SIZE.y / 16f
-                                    ))
-                            )
-                    )
-            );
-        }
+        energyField = new EnergyField(MAX_GAME_SIZE, 4096);
         leaderboard = new ArrayList<>();
+
     }
 
 
@@ -57,19 +43,12 @@ public class GameMaster {
         nextMoveAll(false);
         if (colony.isEmpty()) {
             if (leaderboard.isEmpty()) {
-                generateCells(
-                        new Cell(1, INIT_POSITION.cpy()),
-                        LEADERBOARD_SIZE
-                );
+                generateCells(initColonySize);
             }
             else {
                 for (Cell leaderCell : leaderboard) {
-                    generateCells(leaderCell, 4);
+                    generateChildren(leaderCell, 2);
                 }
-                generateCells(
-                        new Cell(1, INIT_POSITION.cpy()),
-                        LEADERBOARD_SIZE
-                );
             }
         }
     }
@@ -92,7 +71,11 @@ public class GameMaster {
     }
 
     private double getScore(Cell cell) {
-        return (cell.getAge() * 0.75) + (cell.getEnergy().getAmount() * 0.25);
+        return (Math.abs(cell.getPosition().x) * 0.00)
+                + (Math.abs(cell.getPosition().y) * 0.00)
+                + (cell.getAge() * 1.00)
+                + (cell.getEnergy().getAmount() * 1.00)
+                - (cell.getTurnsSinceMove() * 10.00);
     }
 
     /*
@@ -115,12 +98,10 @@ public class GameMaster {
                 new Vector2(1f, -1f)
         };
         for (int i = 0; i < offsets.length; i++) {
-            for (Energy stack : energyStacks) {
-                if (stack.getPosition().equals(
-                        cell.getPosition().cpy().add(offsets[i])
-                )) {
-                    neighborhood[i] = stack;
-                }
+            Vector2 pos = cell.getPosition().cpy().add(offsets[i].cpy());
+            Energy detect = energyField.getEnergy(pos);
+            if (detect != null) {
+                neighborhood[i] = detect;
             }
         }
         return neighborhood;
@@ -136,15 +117,17 @@ public class GameMaster {
                 colony.remove(i);
             }
         }
-        for (int i = 0; i < energyStacks.size(); i++) {
-            if (energyStacks.get(i).getAmount() <= 0) {
-                energyStacks.remove(i);
-            }
+        return this;
+    }
+
+    public GameMaster generateCells(int count) {
+        for (int i = 0; i < count; i++) {
+            colony.add(new Cell(1, INIT_POSITION.cpy()));
         }
         return this;
     }
 
-    public GameMaster generateCells(Cell parent, int count) {
+    public GameMaster generateChildren(Cell parent, int count) {
         for (int i = 0; i < count; i++) {
             colony.add(parent.divide());
         }
@@ -223,8 +206,8 @@ public class GameMaster {
         return colony;
     }
 
-    public ArrayList<Energy> getEnergyStacks() {
-        return energyStacks;
+    public EnergyField getEnergyField() {
+        return energyField;
     }
 
     public void setInitPosition(Vector2 initPosition) {
