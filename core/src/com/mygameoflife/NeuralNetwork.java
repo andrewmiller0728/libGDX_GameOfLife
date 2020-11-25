@@ -81,4 +81,13 @@ public class NeuralNetwork {
     public NeuralNetwork getCopy() {
         return new NeuralNetwork(this.ID, this.layers);
     }
+
+    public NeuralNetwork walkValues(double step) {
+        for (ArrayList<Perceptron> layer : layers) {
+            for (Perceptron node : layer) {
+                node.walkValues(step);
+            }
+        }
+        return this;
+    }
 }

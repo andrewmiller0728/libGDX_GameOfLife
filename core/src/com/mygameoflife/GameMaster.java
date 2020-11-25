@@ -12,10 +12,10 @@ public class GameMaster {
      */
     public final Vector2 MAX_GAME_SIZE = new Vector2(800f, 800f);
     private final Vector2 INIT_POSITION = new Vector2(0f, 0f);
+    private final int LEADERBOARD_SIZE = 32;
     private Vector2 initPosition;
-    private ArrayList<Cell> colony;
+    private ArrayList<Cell> colony, leaderboard;
     private ArrayList<Energy> energyStacks;
-
 
     /*
     Constructor
@@ -44,6 +44,7 @@ public class GameMaster {
                     )
             );
         }
+        leaderboard = new ArrayList<>();
     }
 
 
@@ -52,15 +53,46 @@ public class GameMaster {
      */
     public void update() {
         clearDead();
-        updateEnergyNeighborhoods();
+        updateCellData();
         nextMoveAll(false);
-        ageCells();
+        if (colony.isEmpty()) {
+            if (leaderboard.isEmpty()) {
+                generateCells(
+                        new Cell(1, INIT_POSITION.cpy()),
+                        LEADERBOARD_SIZE
+                );
+            }
+            else {
+                for (Cell leaderCell : leaderboard) {
+                    generateCells(leaderCell, 4);
+                }
+                generateCells(
+                        new Cell(1, INIT_POSITION.cpy()),
+                        LEADERBOARD_SIZE
+                );
+            }
+        }
     }
 
-    public void updateEnergyNeighborhoods() {
-        for (Cell cell : colony) {
-            cell.setEnergyNeighborhood(getNeighborhood(cell));
+    public void updateCellData() {
+        for (int i = 0; i < colony.size(); i++) {
+            colony.get(i).setEnergyNeighborhood(getNeighborhood(colony.get(i)));
+            colony.get(i).incrementAge();
+            if (leaderboard.size() < LEADERBOARD_SIZE) {
+                leaderboard.add(colony.get(i));
+            }
+            else {
+                for (int j = 0; j < leaderboard.size(); j++) {
+                    if (getScore(colony.get(i)) > getScore(leaderboard.get(j))) {
+                        leaderboard.set(j, colony.get(i));
+                    }
+                }
+            }
         }
+    }
+
+    private double getScore(Cell cell) {
+        return (cell.getAge() * 0.75) + (cell.getEnergy().getAmount() * 0.25);
     }
 
     /*
@@ -96,7 +128,11 @@ public class GameMaster {
 
     public GameMaster clearDead() {
         for (int i = 0; i < colony.size(); i++) {
-            if (colony.get(i).getEnergy().getAmount() <= 0) {
+            if (colony.get(i).getEnergy().getAmount() <= 0
+                    || colony.get(i).getPosition().x > MAX_GAME_SIZE.x
+                    || colony.get(i).getPosition().x < -1f * MAX_GAME_SIZE.x
+                    || colony.get(i).getPosition().y < -1f * MAX_GAME_SIZE.y
+                    || colony.get(i).getPosition().y > MAX_GAME_SIZE.y) {
                 colony.remove(i);
             }
         }
@@ -108,29 +144,9 @@ public class GameMaster {
         return this;
     }
 
-    public GameMaster clearOutofBounds() {
-        for (int i = 0; i < colony.size(); i++) {
-            Cell currCell = colony.get(i);
-            if (currCell.getPosition().x > MAX_GAME_SIZE.x
-                    || currCell.getPosition().x < -1f * MAX_GAME_SIZE.x
-                    || currCell.getPosition().y < -1f * MAX_GAME_SIZE.y
-                    || currCell.getPosition().y > MAX_GAME_SIZE.y) {
-                colony.remove(i);
-            }
-        }
-        return this;
-    }
-
-    public GameMaster generateCells(int count) {
+    public GameMaster generateCells(Cell parent, int count) {
         for (int i = 0; i < count; i++) {
-            colony.add(new Cell(i, initPosition.cpy()));
-        }
-        return this;
-    }
-
-    public GameMaster ageCells() {
-        for (Cell cell : colony) {
-            cell.incrementAge();
+            colony.add(parent.divide());
         }
         return this;
     }
@@ -164,7 +180,7 @@ public class GameMaster {
     }
 
     private GameMaster randomNextMove(Cell cell) {
-        nextMoveHelper(MathUtils.random(50), cell);
+        nextMoveHelper(MathUtils.random(25), cell);
         return this;
     }
 
@@ -190,9 +206,9 @@ public class GameMaster {
                     );
                 }
                 break;
-            case 5:
-                colony.add(cell.divide());
-                break;
+//            case 5:
+//                colony.add(cell.divide());
+//                break;
             default:
                 cell.sleep();
                 break;

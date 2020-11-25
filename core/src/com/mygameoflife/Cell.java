@@ -7,15 +7,15 @@ public class Cell {
     /*
     Variables
      */
-    private final float INIT_ENERGY = 500f;
+    private final float INIT_ENERGY = 100f;
     private final float INIT_HEAT = 100f;
-    private final float MOVE_COST = 5;
+    private final float MOVE_COST = 5f, SLEEP_COST = 2f, DIV_COST = 25f;
 
     private int ID;
     private Energy energy;
     private float heat;
     private Vector2 position;
-    private NeuralNetwork NN;
+    private NeuralNetwork network;
     private Energy[] energyNeighborhood;
     private int age;
 
@@ -28,13 +28,23 @@ public class Cell {
         this.energy = new Energy(INIT_ENERGY, initPosition);
         this.heat = INIT_HEAT;
         this.position = initPosition;
-        this.NN = new NeuralNetwork(
+        this.network = new NeuralNetwork(
                 ID_,
                 13,
-                7,
+                6,
                 14,
                 2
         );
+        energyNeighborhood = new Energy[9];
+        age = 0;
+    }
+
+    public Cell(int ID_, Vector2 initPosition, NeuralNetwork network) {
+        this.ID = ID_;
+        this.energy = new Energy(INIT_ENERGY, initPosition);
+        this.heat = INIT_HEAT;
+        this.position = initPosition;
+        this.network = network;
         energyNeighborhood = new Energy[9];
         age = 0;
     }
@@ -55,8 +65,7 @@ public class Cell {
                 inputs[i + 3] = energyNeighborhood[i].getAmount();
             }
         }
-
-        double[] outputs = NN.getOutputs(inputs);
+        double[] outputs = network.getOutputs(inputs);
         int indexMax = -1;
         double maxValue = Double.MIN_VALUE;
         for (int i = 0; i < outputs.length; i++) {
@@ -65,6 +74,7 @@ public class Cell {
                 maxValue = outputs[i];
             }
         }
+        energy.deplete(SLEEP_COST);
         return indexMax;
     }
 
@@ -121,12 +131,12 @@ public class Cell {
      */
 
     public Cell divide() {
-        energy.deplete(100f);
-        return new Cell(this.ID, this.position.cpy());
+        energy.deplete(DIV_COST);
+        return new Cell(ID + 1, position.cpy(), network.getCopy());
     }
 
     public Cell sleep() {
-        energy.deplete(1);
+        energy.deplete(SLEEP_COST);
         return this;
     }
 
@@ -182,5 +192,9 @@ public class Cell {
 
     public Energy[] getEnergyNeighborhood() {
         return energyNeighborhood;
+    }
+
+    public int getAge() {
+        return age;
     }
 }

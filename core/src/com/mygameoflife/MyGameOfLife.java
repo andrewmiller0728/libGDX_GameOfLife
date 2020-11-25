@@ -37,7 +37,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 		energyTexture = new Texture("icon_energy.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		gm = new GameMaster(256);
+		gm = new GameMaster((int) Math.pow(2, 8));
 	}
 
 	@Override

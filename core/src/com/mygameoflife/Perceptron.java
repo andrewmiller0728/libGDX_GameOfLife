@@ -1,5 +1,7 @@
 package com.mygameoflife;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -48,6 +50,13 @@ public class Perceptron {
 
     public Perceptron getCopy() {
         return new Perceptron(this.ID, this.weights, this.bias);
+    }
+
+    public void walkValues(double step) {
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] += weights[i] * step * MathUtils.randomSign();
+        }
+        bias += bias * step * MathUtils.randomSign();
     }
 
 
