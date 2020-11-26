@@ -37,7 +37,17 @@ public class MyGameOfLife extends ApplicationAdapter {
 		energyTexture = new Texture("icon_energy.jpg");
 		shapeRenderer = new ShapeRenderer();
 
-		gm = new GameMaster((int) Math.pow(2, 14));
+		gm = new GameMaster((int) Math.pow(2, 10));
+
+		System.out.print("PRE-TRAINING...\n\tProgress:\n\t...");
+		int iterations = 10000;
+		for (int i = 0; i < iterations; i++) {
+			gm.update();
+			if (i % (iterations / 10f) == 0) {
+				System.out.printf("%d...", i / (iterations / 10) + 1);
+			}
+		}
+		System.out.println("...\n...Launching");
 	}
 
 	@Override
@@ -52,16 +62,21 @@ public class MyGameOfLife extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		for (Energy stack : gm.getEnergyField().getEntries()) {
+			drawEnergy(stack);
+		}
 		for (Cell cell : gm.getColony()) {
 			drawCell(cell);
 			expandCamera(cell);
 		}
-		for (Energy stack : gm.getEnergyField().getEntries()) {
-			drawEnergy(stack);
-		}
 		batch.end();
 
-		gm.update();
+		float tps = 20;
+		float time = Gdx.graphics.getDeltaTime();
+		float frames = MathUtils.clamp(tps * time, 1, 50);
+		for (int i = 0; i < frames; i++) {
+			gm.update();
+		}
 	}
 	
 	@Override
@@ -71,7 +86,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 	}
 
 	private void drawCell(Cell cell_) {
-		batch.setColor(1f, 1f,1f,0.2f);
+		batch.setColor(1f, 1f,1f,0.8f);
 		batch.draw(
 				cellTexture,
 				(cell_.getPosition().x * 8f) - (cellTexture.getWidth() / 2f),
@@ -80,7 +95,7 @@ public class MyGameOfLife extends ApplicationAdapter {
 	}
 
 	private void drawEnergy(Energy stack) {
-		batch.setColor(1f, 1f,1f,0.8f);
+		batch.setColor(1f, 1f,1f,0.2f);
 		batch.draw(
 				energyTexture,
 				(stack.getPosition().x * 8f) - (energyTexture.getWidth() / 2f),

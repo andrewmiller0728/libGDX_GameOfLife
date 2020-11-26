@@ -12,7 +12,7 @@ public class GameMaster {
      */
     public final Vector2 MAX_GAME_SIZE = new Vector2(800f, 800f);
     private final Vector2 INIT_POSITION = new Vector2(0f, 0f);
-    private final int LEADERBOARD_SIZE = (int) Math.pow(2, 10);
+    private final int LEADERBOARD_SIZE = (int) Math.pow(2, 5);
     private int initColonySize;
     private Vector2 initPosition;
     private ArrayList<Cell> colony, leaderboard;
@@ -28,7 +28,7 @@ public class GameMaster {
         for (int i = 0; i < initColonySize; i++) {
             colony.add(new Cell(i, initPosition.cpy()));
         }
-        energyField = new EnergyField(MAX_GAME_SIZE, 4096);
+        energyField = new EnergyField(MAX_GAME_SIZE, 8192);
         leaderboard = new ArrayList<>();
 
     }
@@ -47,8 +47,9 @@ public class GameMaster {
             }
             else {
                 for (Cell leaderCell : leaderboard) {
-                    generateChildren(leaderCell, 2);
+                    generateChildren(leaderCell, 16);
                 }
+                generateCells(initColonySize / 2);
             }
         }
     }
@@ -71,11 +72,11 @@ public class GameMaster {
     }
 
     private double getScore(Cell cell) {
-        return (Math.abs(cell.getPosition().x) * 0.00)
-                + (Math.abs(cell.getPosition().y) * 0.00)
+        return (Math.abs(cell.getPosition().x) * 1.00)
+                + (Math.abs(cell.getPosition().y) * 1.00)
                 + (cell.getAge() * 1.00)
                 + (cell.getEnergy().getAmount() * 1.00)
-                - (cell.getTurnsSinceMove() * 10.00);
+                - (cell.getTurnsSinceMove() * 1000.00);
     }
 
     /*

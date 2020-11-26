@@ -7,9 +7,9 @@ public class Cell {
     /*
     Variables
      */
-    private final float INIT_ENERGY = 250f;
+    private final float INIT_ENERGY = 300f;
     private final float INIT_HEAT = 100f;
-    private final float MOVE_COST = 5f, SLEEP_COST = 2f, DIV_COST = 25f;
+    private final float MOVE_COST = 5f, SLEEP_COST = 4f, DIV_COST = 25f;
 
     private int ID;
     private Energy energy;
@@ -32,8 +32,8 @@ public class Cell {
                 ID_,
                 13,
                 6,
-                14,
-                2
+                4,
+                14
         );
         energyNeighborhood = new Energy[9];
         age = 0;
@@ -58,8 +58,8 @@ public class Cell {
 
     public int getOutputChoice() {
         double[] inputs = new double[13];
-        inputs[0] = position.x;
-        inputs[1] = position.y;
+        inputs[0] = Math.abs(position.x);
+        inputs[1] = Math.abs(position.y);
         inputs[2] = age;
         inputs[3] = energy.getAmount();
         for (int i = 0; i < energyNeighborhood.length; i++) {
